@@ -99,8 +99,6 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
     const uint16_t *qmat, *bias;
     LOCAL_ALIGNED_16(int16_t, temp_block, [64]);
 
-    av_assert2((7&(uintptr_t)(&temp_block[0])) == 0); //did gcc align it correctly?
-
     //s->fdct (block);
     RENAME_FDCT(ff_fdct)(block); // cannot be anything else ...
 
@@ -225,7 +223,8 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
     if(s->mb_intra) block[0]= level;
     else            block[0]= temp_block[0];
 
-    if (s->idsp.perm_type == FF_IDCT_PERM_SIMPLE) {
+    av_assert2(ARCH_X86_32 || s->idsp.perm_type != FF_IDCT_PERM_SIMPLE);
+    if (ARCH_X86_32 && s->idsp.perm_type == FF_IDCT_PERM_SIMPLE) {
         if(last_non_zero_p1 <= 1) goto end;
         block[0x08] = temp_block[0x01]; block[0x10] = temp_block[0x08];
         block[0x20] = temp_block[0x10];
@@ -402,7 +401,7 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
         block[0x3D] = temp_block[0x2F]; block[0x3E] = temp_block[0x37];
         block[0x37] = temp_block[0x3E]; block[0x3F] = temp_block[0x3F];
     } else {
-        av_log(s, AV_LOG_DEBUG, "s->idsp.perm_type: %d\n",
+        av_log(s->avctx, AV_LOG_DEBUG, "s->idsp.perm_type: %d\n",
                 (int)s->idsp.perm_type);
         av_assert0(s->idsp.perm_type == FF_IDCT_PERM_NONE ||
                 s->idsp.perm_type == FF_IDCT_PERM_LIBMPEG2 ||

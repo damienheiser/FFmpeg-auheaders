@@ -22,9 +22,7 @@
 #include "libavutil/opt.h"
 #include "libavutil/random_seed.h"
 #include "avfilter.h"
-#include "formats.h"
-#include "internal.h"
-#include "video.h"
+#include "filters.h"
 
 #define MAX_FRAMES 512
 
@@ -143,11 +141,11 @@ static const AVFilterPad random_outputs[] = {
     },
 };
 
-const AVFilter ff_vf_random = {
-    .name        = "random",
-    .description = NULL_IF_CONFIG_SMALL("Return random frames."),
+const FFFilter ff_vf_random = {
+    .p.name        = "random",
+    .p.description = NULL_IF_CONFIG_SMALL("Return random frames."),
+    .p.priv_class  = &random_class,
     .priv_size   = sizeof(RandomContext),
-    .priv_class  = &random_class,
     .init        = init,
     .uninit      = uninit,
     FILTER_INPUTS(random_inputs),

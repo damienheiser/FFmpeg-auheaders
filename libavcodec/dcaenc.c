@@ -25,13 +25,13 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/common.h"
 #include "libavutil/ffmath.h"
+#include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/opt.h"
 #include "libavutil/thread.h"
 #include "libavutil/tx.h"
 #include "avcodec.h"
 #include "codec_internal.h"
-#include "dca.h"
 #include "dcaadpcm.h"
 #include "dcamath.h"
 #include "dca_core.h"
@@ -1322,20 +1322,11 @@ const FFCodec ff_dca_encoder = {
     .close                 = encode_close,
     FF_CODEC_ENCODE_CB(encode_frame),
     .caps_internal         = FF_CODEC_CAP_INIT_CLEANUP,
-    .p.sample_fmts         = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S32,
-                                                            AV_SAMPLE_FMT_NONE },
-    .p.supported_samplerates = sample_rates,
-    CODEC_OLD_CHANNEL_LAYOUTS(AV_CH_LAYOUT_MONO, AV_CH_LAYOUT_STEREO,
-                              AV_CH_LAYOUT_2_2,  AV_CH_LAYOUT_5POINT0,
-                              AV_CH_LAYOUT_5POINT1)
-    .p.ch_layouts     = (const AVChannelLayout[]){
-        AV_CHANNEL_LAYOUT_MONO,
-        AV_CHANNEL_LAYOUT_STEREO,
-        AV_CHANNEL_LAYOUT_2_2,
-        AV_CHANNEL_LAYOUT_5POINT0,
-        AV_CHANNEL_LAYOUT_5POINT1,
-        { 0 },
-    },
+    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_S32),
+    CODEC_SAMPLERATES_ARRAY(sample_rates),
+    CODEC_CH_LAYOUTS(AV_CHANNEL_LAYOUT_MONO, AV_CHANNEL_LAYOUT_STEREO,
+                     AV_CHANNEL_LAYOUT_2_2,  AV_CHANNEL_LAYOUT_5POINT0,
+                     AV_CHANNEL_LAYOUT_5POINT1),
     .defaults              = defaults,
     .p.priv_class          = &dcaenc_class,
 };
